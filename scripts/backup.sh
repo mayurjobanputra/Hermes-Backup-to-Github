@@ -104,6 +104,14 @@ find . -mindepth 1 -maxdepth 1 \
 log "Copying from $HERMES_HOME..."
 process_manifest
 
+# ── Generate setup dump ─────────────────────────────────────
+log "Generating hermes dump..."
+if command -v hermes &>/dev/null; then
+    hermes dump > "$REPO_DIR/setup-dump.txt" 2>/dev/null || log "⚠ hermes dump failed (non-fatal)"
+else
+    log "⚠ hermes not on PATH, skipping dump"
+fi
+
 # ── Commit & Push ────────────────────────────────────────────
 cd "$REPO_DIR"
 git add -A
