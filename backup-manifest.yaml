@@ -1,0 +1,46 @@
+# Hermes Backup Manifest
+# ─────────────────────────
+# All paths relative to HERMES_HOME (~/.hermes).
+# Edit this file to add/remove backup targets — no script changes needed.
+
+# ── Files (single file copies) ───────────────────────────────
+files:
+  - config.yaml
+  - .env
+  - auth.json
+  - gateway_state.json
+  - channel_directory.json
+  - SOUL.md
+  - config.yaml.save
+
+# ── Directories (recursive copies) ───────────────────────────
+# Format: src → source under HERMES_HOME, dest → destination in repo
+directories:
+  - { src: skills/,     dest: skills/,     exclude: ["__pycache__/", "*.pyc", "node_modules/", "venv/", ".git/"] }
+  - { src: memories/,   dest: memories/ }
+  - { src: cron/,       dest: cron/ }
+  - { src: hooks/,      dest: hooks/ }
+  - { src: pairing/,    dest: pairing/ }
+
+# ── Databases (small state files with size guard) ────────────
+# Backed up nightly only (too noisy for live watcher — every msg writes to state.db)
+databases:
+  - { src: state.db,       dest: databases/state.db,       max_size_mb: 50, watch: false }
+  - { src: state.db-wal,   dest: databases/state.db-wal,   max_size_mb: 50, watch: false }
+  - { src: state.db-shm,   dest: databases/state.db-shm,   max_size_mb: 10, watch: false }
+
+# ── Never back up ────────────────────────────────────────────
+exclude_patterns:
+  - hermes-agent/
+  - sessions/
+  - cache/
+  - logs/
+  - bin/
+  - image_cache/
+  - audio_cache/
+  - whatsapp/
+  - sandboxes/
+  - response_store.db*
+  - models_dev_cache.json
+  - gateway.pid
+  - auth.lock

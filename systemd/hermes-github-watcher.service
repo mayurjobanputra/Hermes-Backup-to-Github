@@ -1,0 +1,15 @@
+[Unit]
+Description=Hermes GitHub Watcher - sync GitHub changes to local
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStartPre=/bin/mkdir -p /root/projects/Hermes-Backup/logs
+ExecStart=/bin/bash /root/projects/Hermes-Backup/scripts/watcher.sh 60
+Restart=always
+RestartSec=10
+Environment=HOME=/root
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=Hermes Local Watcher - push config changes to GitHub
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStartPre=/bin/mkdir -p /root/projects/Hermes-Backup/logs
+ExecStart=/bin/bash /root/projects/Hermes-Backup/scripts/local-watcher.sh
+Restart=always
+RestartSec=10
+Environment=HOME=/root
+
+[Install]
+WantedBy=multi-user.target
