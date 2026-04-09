@@ -34,6 +34,19 @@ Only custom configuration — not the 5GB hermes-agent codebase or Python venv. 
 | `auth.json` | Platform credentials | Yes |
 | `state.db` | Session database | No (nightly only) |
 
+### Why is state.db not live-synced?
+
+Every message you send or receive — Telegram, Discord, CLI — writes to `state.db`. That's the session database tracking conversations, tool calls, and history. If live-watched, it would trigger a git commit and push on **every single message**, flooding your repo with hundreds of noisy commits per day.
+
+Instead, `state.db` (and its WAL/SHM files) are backed up nightly at 3 AM via cron. You still get daily snapshots of your session history without the commit spam. This is controlled by `watch: false` in `backup-manifest.yaml`:
+
+```yaml
+databases:
+  - { src: state.db, dest: databases/state.db, max_size_mb: 50, watch: false }
+```
+
+If you ever need more frequent database backups, set `watch: true` — just be aware of the commit volume.
+
 Customize what gets backed up by editing `backup-manifest.yaml` — no script changes needed.
 
 ## Quick Start
