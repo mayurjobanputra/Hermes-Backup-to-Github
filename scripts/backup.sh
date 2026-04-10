@@ -87,22 +87,56 @@ print(f"SYNCED_COUNT={len(actions)}")
 PYEOF
 }
 
-# ── Clean repo (preserve scripts, manifest, .git, templates, systemd) ──
+# ── Clean repo (preserve scripts, manifest, .git) ────────────
 log "Cleaning repo working tree..."
 cd "$REPO_DIR"
 find . -mindepth 1 -maxdepth 1 \
     ! -name '.git' \
     ! -name 'scripts' \
-    ! -name 'systemd' \
-    ! -name 'templates' \
+    ! -name 'logs' \
     ! -name 'backup-manifest.yaml' \
-    ! -name 'prompt.md' \
     ! -name 'README.md' \
     -exec rm -rf {} + 2>/dev/null || true
 
 # ── Process manifest ─────────────────────────────────────────
 log "Copying from $HERMES_HOME..."
 process_manifest
+
+# ── Generate README ──────────────────────────────────────────
+if ! $DRY_RUN; then
+    cat > "$REPO_DIR/README.md" << 'EOF'
+# Hermes-Backup
+
+Automated backup of custom Hermes Agent configuration.
+
+## Structure
+
+```
+backup-manifest.yaml  # What gets backed up (edit this to add files)
+config.yaml           # Core settings
+.env                  # API keys (private repo)
+skills/               # Custom skills
+memories/             # Persistent memory
+cron/                 # Scheduled jobs
+hooks/                # Event hooks
+databases/            # State databases
+scripts/              # backup.sh, sync-down.sh, watcher.sh
+```
+
+## Usage
+
+```bash
+./scripts/backup.sh          # Push local → GitHub
+./scripts/sync-down.sh       # Pull GitHub → local
+./scripts/watcher.sh &       # Auto-sync GitHub changes
+```
+
+## Adding files
+
+Edit `backup-manifest.yaml` — add to `files:` or `directories:`.
+No script changes needed.
+EOF
+fi
 
 # ── Generate setup dump ─────────────────────────────────────
 log "Generating hermes dump..."
