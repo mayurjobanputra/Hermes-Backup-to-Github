@@ -1,0 +1,19 @@
+# Hermes Backup Configuration
+# ─────────────────────────────
+# Optional settings for the backup system.
+# Copy this file to your private backup repo and edit as needed.
+
+# ── AI Commit Messages ───────────────────────────────────────
+# When enabled, backup.sh sends the git diff to OpenRouter to generate
+# a descriptive commit message instead of the default "backup: <timestamp>".
+#
+# Requires an OpenRouter API key. Get one at https://openrouter.ai/keys
+# Uses openai/gpt-4o-mini by default (~$0.15/M input tokens — very cheap).
+#
+# If the API call fails for any reason, it silently falls back to the
+# default timestamp-based commit message.
+
+ai_commit_messages:
+  enabled: false
+  openrouter_api_key: ""           # your OpenRouter API key
+  model: "openai/gpt-4o-mini"     # any OpenRouter-compatible model

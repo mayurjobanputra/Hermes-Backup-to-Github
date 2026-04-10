@@ -95,6 +95,7 @@ find . -mindepth 1 -maxdepth 1 \
     ! -name 'scripts' \
     ! -name 'logs' \
     ! -name 'backup-manifest.yaml' \
+    ! -name 'backup-config.yaml' \
     ! -name 'README.md' \
     -exec rm -rf {} + 2>/dev/null || true
 
@@ -157,7 +158,23 @@ fi
 
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M')
 CHANGED=$(git diff --cached --stat | tail -1)
-git commit -m "backup: $TIMESTAMP" -m "$CHANGED"
+CONFIG_FILE="$REPO_DIR/backup-config.yaml"
+AI_SCRIPT="$SCRIPT_DIR/scripts/ai-commit-msg.py"
+COMMIT_MSG=""
+
+# Try AI-generated commit message if config exists
+if [[ -f "$CONFIG_FILE" ]] && [[ -f "$AI_SCRIPT" ]]; then
+    log "Generating AI commit message..."
+    DIFF=$(git diff --cached)
+    COMMIT_MSG=$(echo "$DIFF" | python3 "$AI_SCRIPT" "$CONFIG_FILE" 2>/dev/null) || true
+fi
+
+if [[ -n "$COMMIT_MSG" ]]; then
+    log "Using AI commit message"
+    git commit -m "$COMMIT_MSG"
+else
+    git commit -m "backup: $TIMESTAMP" -m "$CHANGED"
+fi
 
 if ! $DRY_RUN; then
     git push origin main 2>&1

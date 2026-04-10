@@ -63,9 +63,10 @@ cd ~/projects
 git clone https://github.com/mayurjobanputra/Hermes-Backup-to-Github.git
 git clone https://github.com/YOUR-USER/YOUR-PRIVATE-REPO.git
 
-# 3. Copy the scripts and manifest to your private backup repo
+# 3. Copy the scripts, manifest, and config to your private backup repo
 cp Hermes-Backup-to-Github/scripts/* YOUR-PRIVATE-REPO/scripts/
 cp Hermes-Backup-to-Github/backup-manifest.yaml YOUR-PRIVATE-REPO/
+cp Hermes-Backup-to-Github/backup-config.yaml YOUR-PRIVATE-REPO/
 
 # 4. Configure git credentials
 cd YOUR-PRIVATE-REPO
@@ -87,6 +88,26 @@ sudo systemctl enable --now hermes-local-watcher hermes-github-watcher
 (crontab -l 2>/dev/null; echo "0 3 * * * cd ~/projects/YOUR-PRIVATE-REPO && ./scripts/backup.sh >> logs/backup.log 2>&1") | crontab -
 ```
 
+## AI Commit Messages (Optional)
+
+By default, commits are labeled `backup: 2025-04-09 14:30`. You can enable AI-generated commit messages that describe *what* actually changed — e.g. "Add arxiv research skill" or "Update Telegram pairing config".
+
+It uses [OpenRouter](https://openrouter.ai) with `openai/gpt-4o-mini` (~$0.15/M input tokens — essentially free for backup diffs).
+
+### Setup
+
+1. Copy `backup-config.yaml` to your private backup repo (alongside `backup-manifest.yaml`)
+2. Edit it:
+
+```yaml
+ai_commit_messages:
+  enabled: true
+  openrouter_api_key: "sk-or-v1-..."   # from https://openrouter.ai/keys
+  model: "openai/gpt-4o-mini"          # or any OpenRouter model
+```
+
+That's it. Next time `backup.sh` runs, it'll generate a descriptive commit message from the diff. If the API call fails for any reason, it silently falls back to the default timestamp message.
+
 ## File Structure
 
 ```
@@ -94,8 +115,10 @@ Hermes-Backup-to-Github/
 ├── README.md                  # This file
 ├── prompt.md                  # Drop into Hermes chat for auto-setup
 ├── backup-manifest.yaml       # Defines what gets backed up
+├── backup-config.yaml         # Optional config (AI commit messages, etc.)
 ├── scripts/
 │   ├── backup.sh              # Push local config to GitHub
+│   ├── ai-commit-msg.py       # AI commit message generator (called by backup.sh)
 │   ├── sync-down.sh           # Pull GitHub config to local
 │   ├── watcher.sh             # Poll GitHub for changes (pull)
 │   └── local-watcher.sh       # Watch local files for changes (push)

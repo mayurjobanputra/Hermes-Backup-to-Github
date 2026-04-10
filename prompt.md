@@ -35,6 +35,7 @@ cd ~/projects/PRIVATE-REPO
 mkdir -p scripts systemd logs
 cp ../Hermes-Backup-to-Github/scripts/* scripts/
 cp ../Hermes-Backup-to-Github/backup-manifest.yaml .
+cp ../Hermes-Backup-to-Github/backup-config.yaml .
 cp ../Hermes-Backup-to-Github/systemd/* systemd/
 chmod +x scripts/*.sh
 ```
