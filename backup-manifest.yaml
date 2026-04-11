@@ -21,6 +21,7 @@ directories:
   - { src: cron/,       dest: cron/ }
   - { src: hooks/,      dest: hooks/ }
   - { src: pairing/,    dest: pairing/ }
+  - { src: email/,      dest: email/ }
 
 # ── Databases (small state files with size guard) ────────────
 # Backed up nightly only (too noisy for live watcher — every msg writes to state.db)
